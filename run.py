@@ -8,17 +8,18 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='log directory', default='log/')
-parser.add_argument('--savedir', help='save directory', default='trained_models/')
-parser.add_argument('--gamma', default=0.95, type=float)
+parser.add_argument('--gen_save', help='save directory', default='trained_models/')
+parser.add_argument('--disc_save', help='save directory', default='trained_models/')
 parser.add_argument('--iters', default=int(1e4), type=int)
 args = parser.parse_args()
 
-obs_dims = (4,)
+obs_dims = 4
 n_actions = 2
 
-agent = PPO(Policy_net, (4,), 2)
-D = Discriminator(obs_dims, n_actions)
 env = gym.make("CartPole-v0")
-trainer = GAIL_wrapper(agent, D, env)
 
-trainer.train(args.iters, args.savedir, args.logdir)
+agent = PPO(args.gen_save, Policy_net, obs_dims, 2)
+D = Discriminator(args.disc_save, obs_dims, n_actions)
+trainer = GAIL_wrapper(agent, D, env, args.logdir)
+
+trainer.train(args.iters)
